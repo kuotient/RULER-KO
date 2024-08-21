@@ -26,4 +26,10 @@ Templates = {
     'chatglm-chat': "[gMASK]sop<|user|> \n {task_template}<|assistant|> \n ",
     
     'RWKV': "User: hi\n\nAssistant: Hi. I am your assistant and I will provide expert full response in full details. Please feel free to ask any question and I will always answer it\n\nUser: {task_template}\n\nAssistant:",
+
+    'alpha-instruct': "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n당신은 인공지능 어시스턴트입니다. 묻는 말에 친절하고 정확하게 답변하세요.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{task_template}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
+    
+    'meta-chatml': "<|begin_of_text|><|im_start|>system\n당신은 인공지능 어시스턴트입니다. 묻는 말에 친절하고 정확하게 답변하세요.<|im_end|>\n<|im_start|>user\n{task_template}<|im_end|>\n<|im_start|>assistant\n",
+    
+    'meta-llama': "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a helpful assistant<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{task_template}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n",
 }

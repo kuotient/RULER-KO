@@ -89,7 +89,8 @@ def generate_input_output(num_noises, num_chains, num_hops, is_icl=False):
 
     vars, chains = generate_chains(num_chains, num_hops, is_icl=is_icl)
 
-    noise = "The grass is green. The sky is blue. The sun is yellow. Here we go. There and back again.\n"
+    # noise = "The grass is green. The sky is blue. The sun is yellow. Here we go. There and back again.\n"
+    noise = "풀은 초록색입니다. 하늘은 파란색입니다. 태양은 노란색입니다. 자, 다시 시작합니다. 다시 돌아가봅시다.\n"
 
     # Create a list of the repeated noise
     sentences = [noise] * num_noises

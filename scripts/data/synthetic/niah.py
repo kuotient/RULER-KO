@@ -41,6 +41,9 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")) 
 from tokenizer import select_tokenizer
 from nltk.tokenize import sent_tokenize
+from konlpy.tag import Okt
+from konlpy.corpus import kolaw
+from constants import TYPE_NEEDLE_EN_KO
 
 
 parser = argparse.ArgumentParser()
@@ -74,23 +77,26 @@ args.num_needle_k = max(args.num_needle_k, args.num_needle_q)
 TOKENIZER = select_tokenizer(args.tokenizer_type, args.tokenizer_path)
 
 # Define Needle/Haystack Format 
-needle = "One of the special magic {type_needle_v} for {key} is: {value}."
+# needle = "One of the special magic {type_needle_v} for {key} is: {value}."
+needle = "{key}에 대한 특별한 마법 {type_needle_v} 중 하나는: {value}입니다."
 if args.type_haystack == 'essay':
     essay = os.path.join(os.path.dirname(os.path.abspath(__file__)), "json/PaulGrahamEssays.json")
     essay = json.load(open(essay))['text']
     haystack = re.sub(r'\s+', " ", essay).split(" ")
 elif args.type_haystack == 'repeat':
-    haystack = "The grass is green. The sky is blue. The sun is yellow. Here we go. There and back again."
+    # haystack = "The grass is green. The sky is blue. The sun is yellow. Here we go. There and back again."
+    haystack = "풀은 초록색입니다. 하늘은 파란색입니다. 태양은 노란색입니다. 자, 다시 시작합니다. 다시 돌아가봅시다."
 elif args.type_haystack == 'needle':
     haystack = needle
 else:
     raise NotImplementedError(f'{args.type_haystack} is not implemented.')
 
 
-# Words
-nouns = wonderwords.random_word._get_words_from_text_file("nounlist.txt")
-adjs = wonderwords.random_word._get_words_from_text_file("adjectivelist.txt")
-# verbs = wonderwords.random_word._get_words_from_text_file("verblist.txt")
+# Words - Korean
+constitution = kolaw.open('constitution.txt').read()
+okt = Okt()
+nouns = okt.nouns(constitution)
+adjs = [word for word, pos in okt.pos(constitution) if pos == 'Adjective']
 words = [f"{adj}-{noun}" for adj in adjs for noun in nouns]
 words = sorted(list(set(words)))
 
@@ -119,7 +125,7 @@ def generate_random(type_needle: str):
     elif type_needle == 'uuids':
         return generate_random_uuid()
     else:
-        raise NotImplementedError(f'{args.type_needle} is not implemented.')
+        raise NotImplementedError(f'{type_needle} is not implemented.')
 
 def generate_input_output(num_haystack):
     keys, values, needles = [], [], []
@@ -129,7 +135,7 @@ def generate_input_output(num_haystack):
         for _ in range(args.num_needle_v):
             value.append(generate_random(args.type_needle_v))
             needles.append(needle.format(
-                type_needle_v=args.type_needle_v,
+                type_needle_v=TYPE_NEEDLE_EN_KO[args.type_needle_v],
                 key=keys[-1], 
                 value=value[-1],
             ))
@@ -152,7 +158,6 @@ def generate_input_output(num_haystack):
             if i-1 < len(needles):
                 document_sents_list.append(needles[i-1])
         context = " ".join(document_sents_list)
-
     else:
         if args.type_haystack == 'repeat':
             sentences = [haystack] * num_haystack
@@ -178,15 +183,8 @@ def generate_input_output(num_haystack):
     
     template = args.template
     type_needle_v = args.type_needle_v
-    if args.num_needle_q * args.num_needle_v == 1:
-        template = template.replace('Some', 'A')
-        template = template.replace('are all', 'is')
-        template = template.replace('are', 'is')
-        template = template.replace('answers', 'answer')
-        type_needle_v = type_needle_v[:-1] # remove "s"
-
     input_text = template.format(
-        type_needle_v=type_needle_v,
+        type_needle_v=TYPE_NEEDLE_EN_KO[type_needle_v],
         context=context,
         query=query,
     )

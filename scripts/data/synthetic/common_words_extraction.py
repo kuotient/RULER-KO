@@ -38,6 +38,8 @@ from nemo.collections.asr.parts.utils.manifest_utils import read_manifest, write
 import sys
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")) 
 from tokenizer import select_tokenizer
+from konlpy.tag import Okt
+from konlpy.corpus import kolaw
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--save_dir", type=Path, required=True, help='dataset folder to save dataset')
@@ -62,11 +64,16 @@ random.seed(args.random_seed)
 # Load Tokenizer
 TOKENIZER = select_tokenizer(args.tokenizer_type, args.tokenizer_path)
 
-nouns = wonderwords.random_word._get_words_from_text_file("nounlist.txt")
-adjs = wonderwords.random_word._get_words_from_text_file("adjectivelist.txt")
-verbs = wonderwords.random_word._get_words_from_text_file("verblist.txt")
-words = nouns + adjs + verbs
+# Words - Korean
+constitution = kolaw.open('constitution.txt').read()
+okt = Okt()
+
+nouns = okt.nouns(constitution)
+adjs = [word for word, pos in okt.pos(constitution) if pos == 'Adjective']
+verbs = [word for word, pos in okt.pos(constitution) if pos == 'Verb']
+words = [f"{adj}-{noun}" for adj in adjs for noun in nouns]
 words = sorted(list(set(words)))
+
 random.Random(args.random_seed).shuffle(words)
 
 def get_example(num_words, common_repeats=30, uncommon_repeats=3, common_nums=10):
