@@ -1,3 +1,22 @@
+# 📏 RULER-KO
+- [x] NIAH
+    - [x] Essay
+    - [x] Repeat
+    - [x] 한국어 대명사 조합 for 'words'
+- [ ] QA
+
+### 💡 추가 Requirements
+```
+pip install konlpy
+```
+
+### 데이터셋 다운로드
+```
+cd scripts/data/synthetic/json/
+python download_paulgraham_essay.py
+# QA 현재 지원하지 않음
+# bash download_qa_dataset.sh
+```
 # 📏 RULER: What’s the Real Context Size of Your Long-Context Language Models?
 
 This repository contains code for our paper [RULER: What’s the Real Context Size of Your Long-Context Language Models](https://arxiv.org/abs/2404.06654). RULER generates synthetic examples to evaluate long-context language models with configurable sequence length and task complexity. We benchmark 17 open-source models across 4 task categories (in total 13 tasks) in RULER, evaluating long-context capabilities beyond simple in-context recall. Here are our main results.
